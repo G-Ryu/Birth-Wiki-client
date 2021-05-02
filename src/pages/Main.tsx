@@ -31,7 +31,6 @@ const Main = ({ setIsLoading }: any) => {
   const month = date.split('-')[1];
   const day = date.split('-')[2];
 
-  setIsLoading(true);
   useEffect(() => {
     Axios({
       url: 'https://server.birthwiki.space/data/date',
