@@ -61,3 +61,9 @@ export interface UserProfileCard {
 }
 
 export type BirthwikiType = UserInfo | IsLogin;
+
+export interface date {
+  year: string;
+  month: string;
+  day: string;
+}

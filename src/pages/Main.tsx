@@ -1,10 +1,6 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import Axios from 'axios';
-import { useSpring, animated } from 'react-spring';
-import { useSelector } from 'react-redux';
-import { RootState } from '../store';
-import { Link } from 'react-router-dom';
+import axios from 'axios';
 import HoverCard from '../components/HoverCard';
 import Weather from '../components/Weather';
 import CoverFlow from '../components/CoverFlow';
@@ -19,20 +15,20 @@ import lightning from '../img/lightning.jpg';
 import iridescence from '../img/iridescence.jpg';
 
 const Main = ({ setIsLoading }: any) => {
-  const selectedDate = new URL(window.location.href).pathname;
   const [showCard, setShowCard] = useState(false);
   const [data, setData] = useState(null);
   const [weather, setWeather] = useState(clear);
   const [isHover, setIsHover] = useState(true);
   const [isFlow, setIsFlow] = useState(false);
   const [selected, setSelected] = useState(0);
+  const selectedDate = new URL(window.location.href).pathname;
   const date = selectedDate.split('/')[2];
   const year = date.split('-')[0];
   const month = date.split('-')[1];
   const day = date.split('-')[2];
 
   useEffect(() => {
-    Axios({
+    axios({
       url: 'https://server.birthwiki.space/data/date',
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
