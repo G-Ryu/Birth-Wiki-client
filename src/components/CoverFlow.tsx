@@ -1,4 +1,3 @@
-import { url } from 'node:inspector';
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import './CoverFlow.css';
@@ -6,11 +5,9 @@ import FavoriteButton from './FavoriteButton';
 import CreateCard from './CardCreate';
 import { FaRegArrowAltCircleLeft } from 'react-icons/fa';
 import { FaRegArrowAltCircleRight } from 'react-icons/fa';
-
 import movieCover from '../img/subData/movieCover.jpg';
 import musicCover from '../img/subData/musicCover.jpg';
 import recordCover from '../img/subData/recordCover.jpeg';
-import { check } from 'prettier';
 
 function CoverFlow(props: any) {
   const subMovie = {
@@ -24,12 +21,11 @@ function CoverFlow(props: any) {
     world: { title: '음악정보가 없습니다', poster: musicCover, singer: '가수정보가 없습니다' },
   };
 
-  const data = props.data;
-  const issue = data.issueCard;
-  const death = data.deathCard;
-  const birth = data.birthCard;
-  const movie = data.movieCard ? data.movieCard : subMovie;
-  const music = data.musicCard ? data.musicCard : subMusic;
+  const issue = props.data.issueCard;
+  const death = props.data.deathCard;
+  const birth = props.data.birthCard;
+  const movie = props.data.movieCard ? props.data.movieCard : subMovie;
+  const music = props.data.musicCard ? props.data.musicCard : subMusic;
 
   const cardData = [issue, birth, death, movie, music, 0];
   const cardTitle = [
@@ -52,7 +48,7 @@ function CoverFlow(props: any) {
     setChecked(changeCheck);
     props.setSelected(curCheck - 1);
   };
-
+  console.log('렌더링');
   const nextHandler = () => {
     const curCheck = checked.indexOf(true) === 5 ? -1 : checked.indexOf(true);
     const changeCheck = Array(6).fill(false);
@@ -140,7 +136,7 @@ function CoverFlow(props: any) {
         <FaRegArrowAltCircleLeft />
       </button>
       <div className='slider' tabIndex={0} onKeyUp={pressHandler} draggable='true' onDragStart={dragStart}>
-        {cardData.map((el, idx: any) => {
+        {cardData.map((el, idx: number) => {
           return (
             <input
               key={idx}

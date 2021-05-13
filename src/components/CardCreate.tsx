@@ -13,7 +13,7 @@ function CardCreate({ setChecked }: any) {
   const selectedDate = new URL(window.location.href).pathname.split('/')[2];
   const isSave = useSelector((state: RootState) => state.saveReducer.isSave);
 
-  useEffect(() => {}, [isSave]);
+  //useEffect(() => {}, [isSave]);
 
   const guestCreate = () => {
     if (isGuest) {
@@ -23,47 +23,36 @@ function CardCreate({ setChecked }: any) {
     }
   };
 
-  const changeInfo = () => {
+  const formSubmit = () => {
+    const formTag = document.getElementById('formData') as HTMLFormElement;
+    const form = new FormData(formTag);
+    const resetBtn = document.getElementById('reset') as HTMLInputElement;
+
     axios({
-      url: 'https://server.birthwiki.space/record/look',
+      url: 'https://server.birthwiki.space/record/create',
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      data: {
-        nickName: userInfo.nickName,
-        accessToken: `Bearer ${userInfo.accessToken}`,
-      },
-    }).then((res) => {
-      let newInfo = Object.assign({}, userInfo, { recordCards: res.data.data.recordCards });
-      dispatch(setUserInfo(newInfo));
-      dispatch(setSaveModal(true));
-      setChecked([false, false, false, false, false, true]);
-    });
+      headers: { 'Content-Type': 'multipart/form-data', Authorization: `Bearer ${userInfo.accessToken}` },
+      data: form,
+    })
+      .then((res) => {
+        resetBtn.click();
+        const addRecord = [...userInfo.recordCards, res.data.data.recordCard];
+        const newInfo = Object.assign({}, userInfo, { recordCards: addRecord });
+        dispatch(setUserInfo(newInfo));
+        dispatch(setSaveModal(true));
+        setChecked([false, false, false, false, false, true]);
+      })
+      .catch(() => {
+        //저장 실패 모달
+      });
   };
 
   return (
     <CreateCard>
       <div className='create'>
         <h2>나만의 기록</h2>
-        <iframe name='frAttachFiles' className='invisable' onLoad={changeInfo}></iframe>
-        <form
-          target='frAttachFiles'
-          action='https://server.birthwiki.space/record/create'
-          name='record-form'
-          method='POST'
-          encType='multipart/form-data'
-          id='formData'
-          noValidate={true}
-        >
-          <input
-            className='access'
-            name='accessToken'
-            type='text'
-            value={`Bearer ${userInfo.accessToken}`}
-            style={{ display: 'none' }}
-          />
-          <input type='text' name='nickName' value={`${userInfo.nickName}`} style={{ display: 'none' }} />
+        <form id='formData' noValidate={true}>
           <input type='text' name='date' value={`${selectedDate}`} style={{ display: 'none' }} />
-
           <div className='custom-file'>
             <input
               type='file'
@@ -77,20 +66,20 @@ function CardCreate({ setChecked }: any) {
               사진 업로드
             </label>
           </div>
-
           <div className='crtCard'>
-            <textarea className='card-desc' name='cardDesc' placeholder='내용을 입력하세요' />
+            <textarea className='card-desc' name='contents' placeholder='내용을 입력하세요' />
           </div>
-          <div>
-            {isLogin ? (
-              <input type='submit' value='카드 생성' className='createBtn' />
-            ) : (
-              <button className='createBtn' onClick={guestCreate}>
-                기록하기
-              </button>
-            )}
-          </div>
+          <input type='reset' id='reset' style={{ display: 'none' }} />
         </form>
+        {isLogin ? (
+          <button className='createBtn' onClick={formSubmit}>
+            기록하기
+          </button>
+        ) : (
+          <button className='createBtn' onClick={guestCreate}>
+            게스트기록
+          </button>
+        )}
       </div>
     </CreateCard>
   );

@@ -14,6 +14,6 @@ export default {
     source: null || '',
     accessToken: null || '',
     likeCards: null || [],
-    recordCards: null || [],
+    recordCards: [],
   },
 };
