@@ -8,6 +8,7 @@ import { FaRegArrowAltCircleRight } from 'react-icons/fa';
 import movieCover from '../img/subData/movieCover.jpg';
 import musicCover from '../img/subData/musicCover.jpg';
 import recordCover from '../img/subData/recordCover.jpeg';
+import { prevHandler, nextHandler, clickHandler, pressHandler, wheelHandler } from '../utils/slideHandler';
 
 function CoverFlow(props: any) {
   const subMovie = {
@@ -38,69 +39,17 @@ function CoverFlow(props: any) {
 
   const initCheck = Array(6).fill(false);
   initCheck[props.selected] = true;
-  const [checked, setChecked] = useState(initCheck);
-  const [isMove, setIsMove] = useState(false);
 
-  const prevHandler = () => {
-    const curCheck = checked.indexOf(true) === 0 ? 6 : checked.indexOf(true);
-    const changeCheck = Array(6).fill(false);
-    changeCheck[curCheck - 1] = true;
-    setChecked(changeCheck);
-    props.setSelected(curCheck - 1);
-  };
-  console.log('렌더링');
-  const nextHandler = () => {
-    const curCheck = checked.indexOf(true) === 5 ? -1 : checked.indexOf(true);
-    const changeCheck = Array(6).fill(false);
-    changeCheck[curCheck + 1] = true;
-    setChecked(changeCheck);
-  };
-
-  const clickHandler = (idx: number) => {
-    if (!isMove) {
-      const changeCheck = Array(6).fill(false);
-      changeCheck[idx] = true;
-      setChecked(changeCheck);
+  useEffect(() => {
+    if (props.selected === 5) {
+      const createCover = document.getElementById('createCover') as HTMLImageElement;
+      createCover.style.display = 'none';
     }
-    setIsMove(false);
-  };
-
-  const pressHandler = (e: React.KeyboardEvent<HTMLDivElement>) => {
-    if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') {
-      prevHandler();
-    } else if (e.key === 'ArrowRight' || e.key === 'ArrowUp') {
-      nextHandler();
-    }
-  };
-
-  let prevArr: number[] = [];
-  let nextArr: number[] = [];
-  const wheelHandler = (e: React.WheelEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    // if (e.deltaY > 0) {
-    //   prevArr.push(1);
-    //   setTimeout(() => {
-    //     if (prevArr[0]) {
-    //       prevHandler();
-    //       prevArr = [];
-    //     }
-    //   }, 100);
-    // } else
-    if (e.deltaY < 0) {
-      nextArr.push(1);
-      setTimeout(() => {
-        if (nextArr[0]) {
-          nextHandler();
-          nextArr = [];
-        }
-      }, 100);
-    }
-  };
+  }, []);
 
   let startP: number;
   let endP: number;
   function dragStart(e: any) {
-    setIsMove(true);
     e.preventDefault();
     if (e.type === 'touchstart') {
       startP = e.touches[0].clientX;
@@ -140,20 +89,20 @@ function CoverFlow(props: any) {
           return (
             <input
               key={idx}
-              type='checkbox'
+              type='radio'
               className='slideInput'
               name='testimonial'
               id={`t-${idx + 1}`}
-              checked={checked[idx]}
+              defaultChecked={initCheck[idx]}
               onClick={() => {
-                clickHandler(idx);
+                clickHandler(idx + 1);
               }}
             />
           );
         })}
         <div className='testimonials'>
           {cardData.map((el, idx) => {
-            if (idx < 5) {
+            if (idx !== 5) {
               return (
                 <label key={idx} className='item' htmlFor={`t-${idx + 1}`}>
                   {el.contents ? (
@@ -242,33 +191,31 @@ function CoverFlow(props: any) {
                   )}
                 </label>
               );
+            } else {
+              return (
+                <label htmlFor='t-6' className='item'>
+                  <div className='inner_item'>
+                    <img
+                      id='createCover'
+                      src={`${recordCover}`}
+                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                    />
+                    <div className='sideImg'>
+                      <img
+                        src={`${recordCover}`}
+                        alt={`${recordCover}`}
+                        draggable='false'
+                        onWheel={wheelHandler}
+                      />
+                    </div>
+                    <div className='sideContent'>
+                      <CreateCard />
+                    </div>
+                  </div>
+                </label>
+              );
             }
           })}
-          <label htmlFor='t-6' className='item'>
-            {checked[5] ? (
-              <div className='inner_item'>
-                <div className='sideImg'>
-                  <img
-                    src={`${recordCover}`}
-                    alt={`${recordCover}`}
-                    draggable='false'
-                    onWheel={wheelHandler}
-                  />
-                </div>
-                <div className='sideContent'>
-                  <CreateCard setChecked={setChecked} />
-                </div>
-              </div>
-            ) : (
-              <div>
-                <img
-                  src={`${recordCover}`}
-                  alt={`${recordCover}`}
-                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                />
-              </div>
-            )}
-          </label>
         </div>
         <div className='dots' onWheel={wheelHandler}>
           {cardData.map((el, idx) => {

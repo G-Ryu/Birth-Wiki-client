@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../store/index';
 import { setGuestModal, setGuestReject, setUserInfo, setSaveModal } from '../actions';
+import recordCover from '../img/subData/recordCover.jpeg';
 import axios from 'axios';
 
 function CardCreate({ setChecked }: any) {
@@ -12,8 +13,6 @@ function CardCreate({ setChecked }: any) {
   const dispatch = useDispatch();
   const selectedDate = new URL(window.location.href).pathname.split('/')[2];
   const isSave = useSelector((state: RootState) => state.saveReducer.isSave);
-
-  //useEffect(() => {}, [isSave]);
 
   const guestCreate = () => {
     if (isGuest) {
