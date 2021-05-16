@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import styled from 'styled-components';
 import './CoverFlow.css';
 import FavoriteButton from './FavoriteButton';
@@ -8,7 +8,14 @@ import { FaRegArrowAltCircleRight } from 'react-icons/fa';
 import movieCover from '../img/subData/movieCover.jpg';
 import musicCover from '../img/subData/musicCover.jpg';
 import recordCover from '../img/subData/recordCover.jpeg';
-import { prevHandler, nextHandler, clickHandler, pressHandler, wheelHandler } from '../utils/slideHandler';
+import {
+  prevHandler,
+  nextHandler,
+  clickHandler,
+  pressHandler,
+  wheelHandler,
+  dragStart,
+} from '../utils/slideHandler';
 
 function CoverFlow(props: any) {
   const subMovie = {
@@ -47,45 +54,13 @@ function CoverFlow(props: any) {
     }
   }, []);
 
-  let startP: number;
-  let endP: number;
-  function dragStart(e: any) {
-    e.preventDefault();
-    if (e.type === 'touchstart') {
-      startP = e.touches[0].clientX;
-    } else {
-      startP = e.clientX;
-    }
-    document.onmousemove = dragAction;
-    document.onmouseup = dragEnd;
-  }
-
-  function dragAction(e: any) {
-    if (e.type === 'touchmove') {
-      endP = e.touches[0].clientX;
-    } else {
-      endP = e.clientX;
-    }
-  }
-
-  async function dragEnd(e: any) {
-    if (startP - endP > 0) {
-      await nextHandler();
-    } else if (startP - endP < 0) {
-      await prevHandler();
-    }
-
-    document.onmousemove = null;
-    document.onmouseup = null;
-  }
-
   return (
     <Container>
       <button onClick={prevHandler} className='moveBtn'>
         <FaRegArrowAltCircleLeft />
       </button>
       <div className='slider' tabIndex={0} onKeyUp={pressHandler} draggable='true' onDragStart={dragStart}>
-        {cardData.map((el, idx: number) => {
+        {cardData.map((card, idx: number) => {
           return (
             <input
               key={idx}
@@ -101,97 +76,99 @@ function CoverFlow(props: any) {
           );
         })}
         <div className='testimonials'>
-          {cardData.map((el, idx) => {
-            if (idx !== 5) {
+          {cardData.map((card, idx: number) => {
+            if (idx < 3) {
               return (
                 <label key={idx} className='item' htmlFor={`t-${idx + 1}`}>
-                  {el.contents ? (
-                    <div className='inner_item'>
-                      <div className='sideImg'>
-                        <img
-                          src={`${el.image}`}
-                          alt={`${el.category}`}
-                          draggable='false'
-                          onWheel={wheelHandler}
-                        />
+                  <div className='inner_item'>
+                    <div className='sideImg'>
+                      <img
+                        src={`${card.image}`}
+                        alt={`${card.category}`}
+                        draggable='false'
+                        onWheel={wheelHandler}
+                      />
+                    </div>
+                    <div className='sideContent'>
+                      <div>
+                        <h2 className='cardTitle'>{cardTitle[idx]}</h2>
                       </div>
-                      <div className='sideContent'>
-                        <div>
-                          <h2 className='cardTitle'>{cardTitle[idx]}</h2>
-                        </div>
-                        <div className='issueList'>
-                          {el.contents.map((list: any, i: any) => {
-                            return (
-                              <p key={i}>
-                                <span>{list[0]}</span> {list[1]}
-                              </p>
-                            );
-                          })}
-                        </div>
-                        <div>
-                          <FavoriteButton cardData={el} />
-                        </div>
+                      <div className='issueList'>
+                        {card.contents.map((list: string[], key: number) => {
+                          return (
+                            <p key={key}>
+                              <span>{list[0]}</span> {list[1]}
+                            </p>
+                          );
+                        })}
+                      </div>
+                      <div>
+                        <FavoriteButton cardData={card} />
                       </div>
                     </div>
-                  ) : (
-                    <div className='inner_item'>
-                      <div className='sideImg'>
-                        <img
-                          src={`${el.image}`}
-                          alt={`${el.category}`}
-                          draggable='false'
-                          onWheel={wheelHandler}
-                        />
-                      </div>
-                      <div className='sideContent'>
-                        <div>
-                          <h2 className='cardTitle'>{cardTitle[idx]}</h2>
-                        </div>
-                        <div>
-                          {el.world ? (
-                            <>
-                              <img
-                                src={`${el.world.poster}`}
-                                alt={`${el.world.title}`}
-                                style={{ width: '100px', height: '100px' }}
-                                draggable='false'
-                              />
-                              <h3>{el.world.title}</h3>
-                            </>
-                          ) : (
-                            <div>자료없음</div>
-                          )}
-                          {el.world && el.world.singer ? (
-                            <h4>{el.world.singer.replace('&amp;', '&')}</h4>
-                          ) : null}
-                          <p>해외</p>
-                          {el.korea ? (
-                            <>
-                              <img
-                                src={`${el.korea.poster}`}
-                                alt={`${el.korea.title}`}
-                                style={{ width: '100px', height: '100px' }}
-                                draggable='false'
-                              />
-                              <h3>{el.korea.title}</h3>
-                            </>
-                          ) : (
-                            <div>자료없음</div>
-                          )}
-                          {el.korea && el.korea.singer ? (
-                            <h4>{el.korea.singer.replace('&amp;', '&')}</h4>
-                          ) : null}
-                          <p>한국</p>
-                        </div>
-                        <div>
-                          <FavoriteButton cardData={el} />
-                        </div>
-                      </div>
-                    </div>
-                  )}
+                  </div>
                 </label>
               );
-            } else {
+            } else if (idx === 3 || idx === 4) {
+              return (
+                <label key={idx} className='item' htmlFor={`t-${idx + 1}`}>
+                  <div className='inner_item'>
+                    <div className='sideImg'>
+                      <img
+                        src={`${card.image}`}
+                        alt={`${card.category}`}
+                        draggable='false'
+                        onWheel={wheelHandler}
+                      />
+                    </div>
+                    <div className='sideContent'>
+                      <div>
+                        <h2 className='cardTitle'>{cardTitle[idx]}</h2>
+                      </div>
+                      <div>
+                        {card.world ? (
+                          <>
+                            <img
+                              src={`${card.world.poster}`}
+                              alt={`${card.world.title}`}
+                              style={{ width: '100px', height: '100px' }}
+                              draggable='false'
+                            />
+                            <h3>{card.world.title}</h3>
+                          </>
+                        ) : (
+                          <div>자료없음</div>
+                        )}
+                        {card.world && card.world.singer ? (
+                          <h4>{card.world.singer.replace('&amp;', '&')}</h4>
+                        ) : null}
+                        <p>해외</p>
+                        {card.korea ? (
+                          <>
+                            <img
+                              src={`${card.korea.poster}`}
+                              alt={`${card.korea.title}`}
+                              style={{ width: '100px', height: '100px' }}
+                              draggable='false'
+                            />
+                            <h3>{card.korea.title}</h3>
+                          </>
+                        ) : (
+                          <div>자료없음</div>
+                        )}
+                        {card.korea && card.korea.singer ? (
+                          <h4>{card.korea.singer.replace('&amp;', '&')}</h4>
+                        ) : null}
+                        <p>한국</p>
+                      </div>
+                      <div>
+                        <FavoriteButton cardData={card} />
+                      </div>
+                    </div>
+                  </div>
+                </label>
+              );
+            } else if (idx === 5) {
               return (
                 <label htmlFor='t-6' className='item'>
                   <div className='inner_item'>

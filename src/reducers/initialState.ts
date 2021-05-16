@@ -13,7 +13,7 @@ export default {
     profileImage: null || '',
     source: null || '',
     accessToken: null || '',
-    likeCards: null || [],
+    likeCards: [],
     recordCards: [],
   },
 };

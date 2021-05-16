@@ -52,23 +52,44 @@ export const pressHandler = (e: React.KeyboardEvent<HTMLDivElement>) => {
 };
 
 const delayArr: number[] = [0];
-export const wheelHandler = (e: React.WheelEvent<HTMLDivElement>) => {
+export const wheelHandler = async (e: React.WheelEvent<HTMLDivElement>) => {
   const body = document.getElementsByTagName('body')[0] as HTMLBodyElement;
   body.style.overflow = 'hidden';
   body.style.paddingRight = '15px';
   if (delayArr[0] === 0) {
+    delayArr[0] = 1;
     if (e.deltaY > 0) {
-      delayArr[0] = -1;
-      prevHandler();
+      await prevHandler();
     } else if (e.deltaY < 0) {
-      delayArr[0] = 1;
-      nextHandler();
+      await nextHandler();
     }
 
-    setTimeout(() => {
+    await setTimeout(() => {
+      body.style.overflow = 'scroll';
+      body.style.paddingRight = '0px';
       delayArr[0] = 0;
     }, 100);
   }
-  body.style.overflow = 'scroll';
-  body.style.paddingRight = '0px';
+};
+
+let startP: number;
+let endP: number;
+export const dragStart = (e: any) => {
+  e.preventDefault();
+  if (e.type === 'touchstart') {
+    startP = e.touches[0].clientX;
+  } else {
+    startP = e.clientX;
+  }
+  document.onmouseup = dragEnd;
+};
+
+const dragEnd = (e: any) => {
+  endP = e.clientX;
+  if (startP - endP > 0) {
+    nextHandler();
+  } else if (startP - endP < 0) {
+    prevHandler();
+  }
+  document.onmouseup = null;
 };

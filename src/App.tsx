@@ -9,16 +9,15 @@ import FavoritePage from './pages/FavoritePage';
 import LaunchPage from './pages/LaunchPage';
 import SidebarSignUp from './components/SidebarSignUp';
 import SidebarEdit from './components/SidebarEdit';
-import GuestModal from './components/GuestModal';
 import GuestReject from './components/GuestReject';
 import SaveModal from './components/saveModal';
 import Footer from './components/Footer';
 import LoadingModal from './components/LoadingModal';
+import Modal from './pages/Modal';
 
 function App(): JSX.Element {
   const isSignup = useSelector((state: RootState) => state.signupReducer.isSignup);
   const isEdit = useSelector((state: RootState) => state.signupReducer.isEdit);
-  const isGuestModal = useSelector((state: RootState) => state.guestReducer.isGuestModal);
   const isReject = useSelector((state: RootState) => state.guestReducer.isReject);
   const isSave = useSelector((state: RootState) => state.saveReducer.isSave);
   const [isLoading, setIsLoading] = useState(false);
@@ -35,7 +34,7 @@ function App(): JSX.Element {
           <Route exact path='/myFavorite' component={FavoritePage} />
         </Switch>
       ) : null}
-      {isGuestModal ? <GuestModal /> : null}
+      <Modal />
       {isReject ? <GuestReject /> : null}
       {isSave ? <SaveModal /> : null}
       {isLoading ? <LoadingModal /> : null}

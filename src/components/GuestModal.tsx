@@ -1,11 +1,12 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
 import { setGuest, setUserInfo, setGuestModal } from '../actions';
 import guestState from '../reducers/guestState';
+import { RootState } from '../store/index';
 
 function GuestModal() {
-  const modalRef = useRef<HTMLDivElement>(null);
+  const isGuestModal = useSelector((state: RootState) => state.guestReducer.isGuestModal);
   const dispatch = useDispatch();
 
   const accept = () => {
@@ -18,8 +19,8 @@ function GuestModal() {
     dispatch(setGuestModal(false));
   };
 
-  return (
-    <Background ref={modalRef} onClick={reject}>
+  return isGuestModal ? (
+    <Background onClick={reject}>
       <ModalWrapper>
         <ModalContent>
           <p>
@@ -36,7 +37,7 @@ function GuestModal() {
         </ModalContent>
       </ModalWrapper>
     </Background>
-  );
+  ) : null;
 }
 
 export default GuestModal;

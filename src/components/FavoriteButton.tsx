@@ -16,17 +16,15 @@ function FavoriteButton(props: any) {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    if (userInfo.likeCards) {
-      userInfo.likeCards.forEach((card: any) => {
-        if (card.id === props.cardData.id && card.category === props.cardData.category) {
-          setIsLikeAdd(true);
-        }
-      });
-    }
+    userInfo.likeCards.forEach((card: any) => {
+      if (card.id === props.cardData.id && card.category === props.cardData.category) {
+        setIsLikeAdd(true);
+      }
+    });
   }, []);
 
   const likeAddHandler = async () => {
-    let action = isLikeAdd ? 'cancel' : 'like';
+    const action = isLikeAdd ? 'cancel' : 'like';
 
     if (!isLogin && !isGuest) {
       dispatch(setGuestModal(true));
@@ -35,14 +33,14 @@ function FavoriteButton(props: any) {
       setIsLikeAdd(!isLikeAdd);
     }
 
-    let newCard = Object.assign({}, props.cardData, { like: true });
+    let newCard = props.cardData;
     let newCards;
     if (action === 'like') {
-      newCards = userInfo.likeCards ? [...userInfo.likeCards, newCard] : [newCard];
+      newCards = [...userInfo.likeCards, newCard];
     } else {
-      newCards = userInfo.likeCards.filter((el: any) => {
-        if (el.id !== newCard.id || el.category !== newCard.category) {
-          return el;
+      newCards = userInfo.likeCards.filter((card: any) => {
+        if (card.id !== newCard.id || card.category !== newCard.category) {
+          return card;
         }
       });
     }
@@ -50,7 +48,6 @@ function FavoriteButton(props: any) {
     let newUserInfo = Object.assign({}, userInfo, {
       likeCards: newCards,
     });
-    dispatch(setUserInfo(newUserInfo));
 
     if (isLogin) {
       await axios({
@@ -68,6 +65,7 @@ function FavoriteButton(props: any) {
         console.log(err);
       });
     }
+    dispatch(setUserInfo(newUserInfo));
   };
 
   const FavoriteBtn = styled.div`

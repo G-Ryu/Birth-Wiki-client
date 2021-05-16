@@ -1,49 +1,59 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../store/index';
 import { setGuestModal, setGuestReject, setUserInfo, setSaveModal } from '../actions';
-import recordCover from '../img/subData/recordCover.jpeg';
 import axios from 'axios';
 
 function CardCreate({ setChecked }: any) {
   const userInfo = useSelector((state: RootState) => state.userInfoReducer.userInfo);
   const isLogin = useSelector((state: RootState) => state.loginReducer.isLogin);
   const isGuest = useSelector((state: RootState) => state.guestReducer.isGuest);
+  const isSave = useSelector((state: RootState) => state.saveReducer.isSave);
   const dispatch = useDispatch();
   const selectedDate = new URL(window.location.href).pathname.split('/')[2];
-  const isSave = useSelector((state: RootState) => state.saveReducer.isSave);
-
-  const guestCreate = () => {
-    if (isGuest) {
-      dispatch(setGuestReject(true));
-    } else {
-      dispatch(setGuestModal(true));
-    }
-  };
 
   const formSubmit = () => {
-    const formTag = document.getElementById('formData') as HTMLFormElement;
-    const form = new FormData(formTag);
-    const resetBtn = document.getElementById('reset') as HTMLInputElement;
+    if (!isLogin && !isGuest) {
+      dispatch(setGuestModal(true));
+    }
 
-    axios({
-      url: 'https://server.birthwiki.space/record/create',
-      method: 'POST',
-      headers: { 'Content-Type': 'multipart/form-data', Authorization: `Bearer ${userInfo.accessToken}` },
-      data: form,
-    })
-      .then((res) => {
-        resetBtn.click();
-        const addRecord = [...userInfo.recordCards, res.data.data.recordCard];
-        const newInfo = Object.assign({}, userInfo, { recordCards: addRecord });
-        dispatch(setUserInfo(newInfo));
-        dispatch(setSaveModal(true));
-        setChecked([false, false, false, false, false, true]);
+    if (isLogin || isGuest) {
+      const formTag = document.getElementById('formData') as HTMLFormElement;
+      const form = new FormData(formTag);
+      const resetBtn = document.getElementById('reset') as HTMLInputElement;
+
+      const imageTag = document.getElementById('field-upload') as HTMLInputElement;
+
+      console.log(imageTag.value);
+      for (let key of form.keys()) {
+        console.log('키', key);
+      }
+
+      for (let value of form.values()) {
+        console.log('밸', value);
+      }
+
+      /*
+      axios({
+        url: 'https://server.birthwiki.space/record/create',
+        method: 'POST',
+        headers: { 'Content-Type': 'multipart/form-data', Authorization: `Bearer ${userInfo.accessToken}` },
+        data: form,
       })
-      .catch(() => {
-        //저장 실패 모달
-      });
+        .then((res) => {
+          resetBtn.click();
+          const recordCards = [...userInfo.recordCards, res.data.data.recordCard];
+          const newInfo = Object.assign({}, userInfo, { recordCards: recordCards });
+          dispatch(setUserInfo(newInfo));
+          dispatch(setSaveModal(true));
+          setChecked([false, false, false, false, false, true]);
+        })
+        .catch(() => {
+          //저장 실패 모달
+        });
+        */
+    }
   };
 
   return (
@@ -70,15 +80,9 @@ function CardCreate({ setChecked }: any) {
           </div>
           <input type='reset' id='reset' style={{ display: 'none' }} />
         </form>
-        {isLogin ? (
-          <button className='createBtn' onClick={formSubmit}>
-            기록하기
-          </button>
-        ) : (
-          <button className='createBtn' onClick={guestCreate}>
-            게스트기록
-          </button>
-        )}
+        <button className='createBtn' onClick={formSubmit}>
+          기록하기
+        </button>
       </div>
     </CreateCard>
   );
